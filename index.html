@@ -355,6 +355,25 @@ button{font-family:inherit; border:none; cursor:pointer; -webkit-tap-highlight-c
 }
 .opt-card.dim{opacity:.5; pointer-events:none;}
 .opt-card .cube-swatch{width:56%; height:56%; border-radius:10px; box-shadow:inset 0 -5px 0 rgba(0,0,0,.18), inset 0 3px 0 rgba(255,255,255,.35);}
+.balloon-wrap{display:flex; flex-direction:column; align-items:center; width:100%;}
+.balloon-shape{
+  width:48%; aspect-ratio:0.85/1; border-radius:50% 50% 50% 50% / 58% 58% 42% 42%;
+  box-shadow:inset -6px -8px 12px rgba(0,0,0,0.18), 0 6px 10px rgba(0,0,0,0.15);
+}
+.balloon-knot{
+  width:0; height:0; margin-top:-2px;
+  border-left:5px solid transparent; border-right:5px solid transparent;
+  border-top:7px solid #999;
+}
+.balloon-string{width:2px; height:16px; background:#c9c0e0; margin-top:1px;}
+.confetti-piece{
+  position:fixed; pointer-events:none; z-index:70;
+  animation: confettiPop var(--dur,900ms) cubic-bezier(.2,.7,.4,1) forwards;
+}
+@keyframes confettiPop{
+  0%{ transform:translate(0,0) rotate(0deg); opacity:1; }
+  100%{ transform:translate(var(--dx),var(--dy)) rotate(var(--rot)); opacity:0; }
+}
 .opt-card.big-num{font-family:'Baloo 2',cursive; color:var(--purple); font-size:clamp(32px,9vw,48px);}
 .opt-card.shape-circle .shape{width:56%; height:56%; border-radius:50%; background:var(--blue);}
 .opt-card.shape-square .shape{width:56%; height:56%; border-radius:8px; background:var(--red);}
@@ -634,10 +653,10 @@ const QUESTIONS = [
     ]},
   { id:7, prompt:"Trouve quelque chose de bleu !", kind:"scene-options", cols:2,
     options:[
-      {swatch:"#4d96ff", emoji:"🎈", correct:true},
-      {swatch:"#ff5b5b", emoji:"🎈", correct:false},
-      {swatch:"#ffd93d", emoji:"🎈", correct:false},
-      {swatch:"#5bd67e", emoji:"🎈", correct:false},
+      {swatch:"#4d96ff", balloon:true, correct:true},
+      {swatch:"#ff5b5b", balloon:true, correct:false},
+      {swatch:"#ffd93d", balloon:true, correct:false},
+      {swatch:"#5bd67e", balloon:true, correct:false},
     ]},
   { id:8, prompt:"Où vit le poisson ?", kind:"scene-then-options", cols:2, scene:["🐟"],
     options:[
@@ -892,13 +911,13 @@ function showQuestion(index, animateIn){
   const render = ()=>{
     document.getElementById("promptText").textContent = q.prompt;
     renderScene(q);
-    renderOptions(q);
+    if(q.kind !== "memory") renderOptions(q);
     card.classList.remove("leaving");
     if(animateIn){
       card.classList.add("entering");
       setTimeout(()=>card.classList.remove("entering"), 520);
     }
-    if(state.voiceOn) speakQuestion(q.prompt);
+    if(state.voiceOn && q.kind !== "memory") speakQuestion(q.prompt);
   };
 
   if(animateIn){
@@ -1009,7 +1028,6 @@ function renderMemoryReveal(q, box){
 }
 
 function renderOptions(q){
-  if(q.kind === "memory") return; // handled by renderMemoryReveal timeout
   const grid = document.getElementById("optionsGrid");
   grid.innerHTML = "";
   const colClass = q.cols === 3 ? "cols-3" : (q.options.length > 3 ? "cols-4" : "cols-2");
@@ -1020,20 +1038,26 @@ function renderOptions(q){
     card.className = "opt-card";
     card.setAttribute("aria-label", optionAriaLabel(opt));
 
-    if(opt.swatch !== undefined && opt.emoji === undefined){
+    if(opt.balloon){
+      const wrap = document.createElement("div");
+      wrap.className = "balloon-wrap";
+      const string = document.createElement("div");
+      string.className = "balloon-string";
+      const shape = document.createElement("div");
+      shape.className = "balloon-shape";
+      shape.style.background = `radial-gradient(circle at 35% 30%, ${lighten(opt.swatch)}, ${opt.swatch})`;
+      const knot = document.createElement("div");
+      knot.className = "balloon-knot";
+      knot.style.borderTopColor = opt.swatch;
+      wrap.appendChild(shape);
+      wrap.appendChild(knot);
+      wrap.appendChild(string);
+      card.appendChild(wrap);
+    } else if(opt.swatch !== undefined){
       const sw = document.createElement("div");
       sw.className = "cube-swatch";
       sw.style.background = opt.swatch;
       card.appendChild(sw);
-    } else if(opt.swatch !== undefined && opt.emoji !== undefined){
-      card.style.background = "linear-gradient(180deg,#fff,#f2edff)";
-      const balloon = document.createElement("div");
-      balloon.style.fontSize = "clamp(30px,8vw,44px)";
-      balloon.style.filter = `drop-shadow(0 0 0 ${opt.swatch})`;
-      balloon.textContent = opt.emoji;
-      balloon.style.color = opt.swatch;
-      balloon.style.setProperty("-webkit-text-fill-color", opt.swatch);
-      card.appendChild(balloon);
     } else if(opt.shape){
       card.classList.add("shape-"+opt.shape);
       const shapeDiv = document.createElement("div");
@@ -1069,6 +1093,15 @@ function renderOptions(q){
   });
 }
 
+function lighten(hex){
+  try{
+    const h = hex.replace("#","");
+    const r = Math.min(255, parseInt(h.substring(0,2),16) + 70);
+    const g = Math.min(255, parseInt(h.substring(2,4),16) + 70);
+    const b = Math.min(255, parseInt(h.substring(4,6),16) + 70);
+    return `rgb(${r},${g},${b})`;
+  }catch(e){ return "#ffffff"; }
+}
 function optionAriaLabel(opt){
   if(opt.label) return opt.label;
   if(opt.emoji) return opt.emoji;
@@ -1090,10 +1123,10 @@ function checkAnswer(opt, cardEl, q){
 
   if(opt.correct){
     cardEl.classList.add("correct-flash");
-    playSound("correct");
+    safeCall(()=>playSound("correct"));
     updateScore(true);
-    showFeedback(pickPraise(), false);
-    launchConfetti();
+    safeCall(()=>showFeedback(pickPraise(), false));
+    safeCall(()=>launchConfetti());
     if(q.isFinal){
       setTimeout(()=>{ finishGame(); }, 1200);
     } else {
@@ -1101,14 +1134,18 @@ function checkAnswer(opt, cardEl, q){
     }
   } else {
     cardEl.classList.add("wrong-flash");
-    playSound("wrong");
-    showFeedback(pickGentle(), true);
+    safeCall(()=>playSound("wrong"));
+    safeCall(()=>showFeedback(pickGentle(), true));
     setTimeout(()=>{
       cardEl.classList.remove("wrong-flash");
       allCards.forEach(c=>c.classList.remove("dim"));
       state.answered = false;
     }, 700);
   }
+}
+
+function safeCall(fn){
+  try{ fn(); }catch(e){ /* a decorative effect failed — never let it block gameplay */ }
 }
 
 function pickPraise(){
@@ -1131,6 +1168,10 @@ function showFeedback(text, gentle){
 
 function advanceQuestion(){
   const prevWorld = currentWorld().id;
+  // Clear old option cards immediately so a stray tap during the transition
+  // never lands on a stale, now-inactive button (was causing "dead button" feel).
+  const grid = document.getElementById("optionsGrid");
+  if(grid) grid.innerHTML = "";
   state.currentIndex++;
   saveProgress();
   updateProgress();
@@ -1306,26 +1347,28 @@ function launchConfetti(count){
   const n = count || 24;
   const colors = ["#ffd166","#ff77b3","#5fe3e8","#b18cff","#7de8a4","#ff6b6b"];
   for(let i=0;i<n;i++){
-    const el = document.createElement("div");
-    el.style.position = "fixed";
-    el.style.left = (45+Math.random()*10)+"%";
-    el.style.top = "40%";
-    el.style.width = (6+Math.random()*6)+"px";
-    el.style.height = el.style.width;
-    el.style.background = colors[Math.floor(Math.random()*colors.length)];
-    el.style.borderRadius = Math.random()>0.5 ? "50%" : "3px";
-    el.style.zIndex = 70;
-    el.style.pointerEvents = "none";
-    const angle = Math.random()*Math.PI*2;
-    const dist = 80 + Math.random()*160;
-    const dx = Math.cos(angle)*dist;
-    const dy = Math.sin(angle)*dist - 60;
-    el.animate([
-      { transform:"translate(0,0) rotate(0deg)", opacity:1 },
-      { transform:`translate(${dx}px, ${dy}px) rotate(${Math.random()*360}deg)`, opacity:0 }
-    ], { duration: 900+Math.random()*500, easing:"cubic-bezier(.2,.7,.4,1)" });
-    document.body.appendChild(el);
-    setTimeout(()=>el.remove(), 1500);
+    try{
+      const el = document.createElement("div");
+      el.className = "confetti-piece";
+      const size = 6+Math.random()*6;
+      el.style.left = (45+Math.random()*10)+"%";
+      el.style.top = "40%";
+      el.style.width = size+"px";
+      el.style.height = size+"px";
+      el.style.background = colors[Math.floor(Math.random()*colors.length)];
+      el.style.borderRadius = Math.random()>0.5 ? "50%" : "3px";
+      const angle = Math.random()*Math.PI*2;
+      const dist = 80 + Math.random()*160;
+      const dx = Math.cos(angle)*dist;
+      const dy = Math.sin(angle)*dist - 60;
+      const dur = 900+Math.random()*500;
+      el.style.setProperty("--dx", dx+"px");
+      el.style.setProperty("--dy", dy+"px");
+      el.style.setProperty("--rot", (Math.random()*360)+"deg");
+      el.style.setProperty("--dur", dur+"ms");
+      document.body.appendChild(el);
+      setTimeout(()=>{ try{ el.remove(); }catch(e){} }, dur+150);
+    }catch(e){ /* decorative confetti failed — never let this block gameplay */ }
   }
 }
 
@@ -1341,19 +1384,19 @@ function finishGame(){
   chest.classList.remove("opening");
 
   setTimeout(()=>{
-    playSound("chest");
+    safeCall(()=>playSound("chest"));
     chest.classList.add("opening");
   }, 500);
 
   setTimeout(()=>{
     chest.textContent = "🏆";
-    playSound("victory");
-    launchConfetti(50);
-    launchConfetti(50);
-    speakQuestion(`Bravo ${PRENOM} ! Tu as réussi toutes les épreuves ! Tu es prête pour le CP !`);
+    safeCall(()=>playSound("victory"));
+    safeCall(()=>launchConfetti(50));
+    safeCall(()=>launchConfetti(50));
+    safeCall(()=>speakQuestion(`Bravo ${PRENOM} ! Tu as réussi toutes les épreuves ! Tu es prête pour le CP !`));
   }, 1500);
 
-  setTimeout(()=> launchConfetti(40), 2200);
+  setTimeout(()=> safeCall(()=>launchConfetti(40)), 2200);
 }
 
 /* ============================================================
