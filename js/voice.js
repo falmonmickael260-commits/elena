@@ -1,0 +1,1 @@
+let last="";export function speak(text){last=text;if(!("speechSynthesis"in window))return; speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(text);u.lang="fr-FR";u.rate=.88;u.pitch=1.08;u.volume=1;speechSynthesis.speak(u)}export function repeat(){if(last)speak(last)}
