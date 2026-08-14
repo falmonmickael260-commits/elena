@@ -1,0 +1,1 @@
+const KEY="elena-adventure-v2";const DEFAULT={stars:0,unlocked:1,completed:[],worldProgress:{}};export function load(){try{return {...DEFAULT,...JSON.parse(localStorage.getItem(KEY)||"{}")}}catch{return {...DEFAULT}}}export function save(state){localStorage.setItem(KEY,JSON.stringify(state))}export function reset(){localStorage.removeItem(KEY);location.reload()}
