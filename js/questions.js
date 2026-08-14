@@ -1,0 +1,22 @@
+export const QUESTION_BANK=[
+{type:"animals",visual:"🐾",q:"Quel animal fait WOUAF WOUAF ?",a:[["🐶","Le chien",1],["🐱","Le chat",0],["🐮","La vache",0],["🐰","Le lapin",0]]},
+{type:"count",visual:"🍎🍎🍎",q:"Combien vois-tu de pommes ?",a:[["3️⃣","Trois",1],["2️⃣","Deux",0],["4️⃣","Quatre",0],["1️⃣","Une",0]]},
+{type:"color",visual:"🎨",q:"Quelle couleur dois-tu trouver ?",a:[["🔴","Rouge",1],["🔵","Bleu",0],["🟢","Vert",0],["🟡","Jaune",0]]},
+{type:"shape",visual:"🔷",q:"Quelle forme a trois côtés ?",a:[["🔺","Triangle",1],["⚪","Cercle",0],["⬛","Carré",0],["⭐","Étoile",0]]},
+{type:"ocean",visual:"🌊",q:"Quel animal vit dans l'océan ?",a:[["🐬","Dauphin",1],["🐘","Éléphant",0],["🦁","Lion",0],["🐔","Poule",0]]},
+{type:"weather",visual:"🌧️",q:"Que prend-on quand il pleut ?",a:[["☂️","Un parapluie",1],["🕶️","Des lunettes",0],["🩴","Des tongs",0],["🎈","Un ballon",0]]},
+{type:"animals",visual:"🐘",q:"Quel animal a une grande trompe ?",a:[["🐘","L'éléphant",1],["🐭","La souris",0],["🐟","Le poisson",0],["🐦","L'oiseau",0]]},
+{type:"math",visual:"⭐ ⭐ ➕ ⭐",q:"Deux étoiles et une autre étoile arrivent. Combien y en a-t-il ?",a:[["3️⃣","Trois",1],["2️⃣","Deux",0],["4️⃣","Quatre",0],["1️⃣","Une",0]]},
+{type:"animals",visual:"🥕",q:"Quel animal aime souvent les carottes ?",a:[["🐰","Le lapin",1],["🦈","Le requin",0],["🦉","Le hibou",0],["🐳","La baleine",0]]},
+{type:"sounds",visual:"🎵",q:"Quel animal fait MIAOU ?",a:[["🐱","Le chat",1],["🐶","Le chien",0],["🐮","La vache",0],["🐴","Le cheval",0]]},
+{type:"space",visual:"🌍",q:"Quelle planète est notre maison ?",a:[["🌍","La Terre",1],["☀️","Le Soleil",0],["🌙","La Lune",0],["🪐","Saturne",0]]},
+{type:"dino",visual:"🦕",q:"Quel dinosaure est très grand ?",a:[["🦕","Le diplodocus",1],["🐭","La souris",0],["🐥","Le poussin",0],["🐰","Le lapin",0]]},
+{type:"nature",visual:"🌱",q:"Qu'est-ce qui pousse dans la terre ?",a:[["🌱","Une plante",1],["🚗","Une voiture",0],["🎈","Un ballon",0],["🧸","Une peluche",0]]},
+{type:"habitat",visual:"🏠",q:"Où vit le poisson ?",a:[["🌊","Dans l'eau",1],["🌳","Dans un arbre",0],["🏜️","Dans le désert",0],["☁️","Dans le ciel",0]]},
+{type:"intruder",visual:"🍎🍐🍌🚗",q:"Quel objet n'est pas un fruit ?",a:[["🚗","La voiture",1],["🍎","La pomme",0],["🍐","La poire",0],["🍌","La banane",0]]},
+{type:"letters",visual:"🔤",q:"Trouve la lettre A.",a:[["A","A",1],["M","M",0],["O","O",0],["T","T",0]]},
+{type:"logic",visual:"🔴 🔵 🔴 🔵 ❓",q:"Quelle couleur vient ensuite ?",a:[["🔴","Rouge",1],["🟢","Vert",0],["🟡","Jaune",0],["⚫","Noir",0]]},
+{type:"animals",visual:"🦓",q:"Quel animal a des rayures noires et blanches ?",a:[["🦓","Le zèbre",1],["🦒","La girafe",0],["🐘","L'éléphant",0],["🐬","Le dauphin",0]]},
+{type:"nature",visual:"☀️",q:"Que voit-on souvent dans le ciel pendant la journée ?",a:[["☀️","Le soleil",1],["🐟","Un poisson",0],["🌱","De l'herbe",0],["🧸","Une peluche",0]]},
+{type:"colors",visual:"🔵 + 🟡",q:"Quelle couleur obtient-on en mélangeant bleu et jaune ?",a:[["🟢","Vert",1],["🔴","Rouge",0],["⚫","Noir",0],["🩷","Rose",0]]}
+];
