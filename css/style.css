@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Elia - Quête Magique</title>
+
+<style>
+body{
+  margin:0;
+  font-family:Arial;
+  background:linear-gradient(180deg,#12002b,#000);
+  color:white;
+  text-align:center;
+}
+
+/* LOADER */
+#loader{
+  position:fixed;
+  inset:0;
+  background:black;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  flex-direction:column;
+}
+
+#loader img{
+  width:200px;
+  border-radius:50%;
+  animation:spin 4s linear infinite;
+}
+
+@keyframes spin{
+  100%{transform:rotate(360deg);}
+}
+
+/* GAME */
+#game{display:none;}
+
+button{
+  padding:15px;
+  margin:10px;
+  border:none;
+  border-radius:10px;
+  background:linear-gradient(45deg,pink,cyan);
+  color:black;
+  font-weight:bold;
+  cursor:pointer;
+}
+
+button:hover{
+  transform:scale(1.1);
+}
+
+/* PROGRESS */
+#progress{
+  height:20px;
+  background:#333;
+}
+
+#bar{
+  height:100%;
+  width:0%;
+  background:lime;
+}
+
+/* CHARACTER */
+#char{
+  font-size:50px;
+  transition:0.5s;
+}
+
+/* WHEEL */
+#wheel{
+  display:none;
+}
+
+</style>
+</head>
+
+<body>
+
+<div id="loader">
+  <img src="https://res.cloudinary.com/dkm8cbylh/image/upload/v1785234188/ChatGPT_Image_28_juil._2026_12_22_47_ur3btw.png">
+  <h2>Chargement magique...</h2>
+</div>
+
+<div id="game">
+  <div id="progress"><div id="bar"></div></div>
+  <h1>🌟 Aide Elia !</h1>
+  <div id="char">🏃‍♀️</div>
+  <h2 id="question"></h2>
+  <div id="answers"></div>
+  <p id="score"></p>
+</div>
+
+<div id="wheel">
+  <h2>🎡 Tourne la roue !</h2>
+  <button onclick="spin()">SPIN</button>
+  <p id="reward"></p>
+</div>
+
+<script>
+
+// LOADER
+setTimeout(()=>{
+  document.getElementById("loader").style.display="none";
+  document.getElementById("game").style.display="block";
+  next();
+},3000);
+
+// QUESTIONS
+let questions = [
+{q:"Elia a 5 bonbons, elle en mange 2, combien reste ?",a:["3","2","4"],c:0},
+{q:"Je suis un nombre, Elia ajoute 3 à 4, combien ?",a:["7","6","8"],c:0},
+{q:"Elia a 10 billes, elle en perd 5 ?",a:["5","4","6"],c:0},
+{q:"Elia voit 6 oiseaux et 2 partent ?",a:["4","3","5"],c:0},
+{q:"Elia a 3 chats et 3 arrivent ?",a:["6","5","7"],c:0},
+];
+
+// VARIABLES
+let i=0;
+let score=0;
+
+// NEXT QUESTION
+function next(){
+  if(i>=questions.length){
+    document.getElementById("game").style.display="none";
+    document.getElementById("wheel").style.display="block";
+    return;
+  }
+
+  let q=questions[i];
+  document.getElementById("question").innerText=q.q;
+
+  let answers="";
+  q.a.sort(()=>Math.random()-0.5);
+
+  q.a.forEach(ans=>{
+    answers+=`<button onclick="check('${ans}')">${ans}</button>`;
+  });
+
+  document.getElementById("answers").innerHTML=answers;
+}
+
+// CHECK
+function check(ans){
+  let correct = questions[i].a[questions[i].c];
+
+  if(ans==correct){
+    score++;
+    document.getElementById("char").style.transform="translateX(50px)";
+  }else{
+    document.body.style.background="red";
+    setTimeout(()=>document.body.style.background="",300);
+  }
+
+  i++;
+  document.getElementById("bar").style.width=(i/questions.length*100)+"%";
+  document.getElementById("score").innerText="Score: "+score;
+
+  next();
+}
+
+// WHEEL
+let rewards=[
+"Macdo","Tete dans les nuages","Livre","5€","Fete foraine","Vetement","10€","Basket"
+];
+
+function spin(){
+  let r=rewards[Math.floor(Math.random()*rewards.length)];
+  document.getElementById("reward").innerText="🎁 "+r;
+}
+
+</script>
+
+</body>
+</html>
